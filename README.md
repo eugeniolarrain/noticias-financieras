@@ -14,9 +14,9 @@ Bot que envía las 5 noticias más importantes del mundo financiero a Telegram t
 2. Envía cualquier mensaje
 3. Guarda tu **Chat ID**
 
-### 3. Obtener API Key de NewsAPI
-1. Ve a https://newsapi.org/
-2. Click en "Get API Key" → Developer (gratis)
+### 3. Obtener API Key de GNews
+1. Ve a https://gnews.io/
+2. Click "Get API Key" (gratis, 100 requests/día)
 3. Regístrate y guarda tu API Key
 
 ### 4. Configurar secrets en GitHub

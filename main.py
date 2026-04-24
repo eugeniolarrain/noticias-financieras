@@ -9,43 +9,41 @@ def obtener_noticias():
     if not api_key:
         raise ValueError("NEWS_API_KEY no configurada")
 
-    # Intento 1: Top headlines business US
-    url = "https://newsapi.org/v2/top-headlines"
+    # Usamos GNews API (funciona desde servidores)
+    url = "https://gnews.io/api/v4/top-headlines"
     params = {
         "category": "business",
-        "country": "us",
-        "pageSize": 10,
-        "apiKey": api_key
+        "lang": "es",
+        "max": 5,
+        "apikey": api_key
     }
 
-    print(f"Llamando a NewsAPI: {url}")
+    print(f"Llamando a GNews API...")
     response = requests.get(url, params=params)
     print(f"Status: {response.status_code}")
     data = response.json()
     print(f"Response: {data}")
 
-    if data.get("status") == "ok" and data.get("totalResults", 0) > 0:
-        articulos = data.get("articles", [])
-        print(f"Encontradas {len(articulos)} noticias")
-        return articulos[:5]
+    if isinstance(data, list) and len(data) > 0:
+        print(f"Encontradas {len(data)} noticias")
+        return data
 
-    # Intento 2: Buscar por keywords de finanzas
+    # Fallback: buscar por keywords
     print("Intentando búsqueda por keywords...")
-    url2 = "https://newsapi.org/v2/everything"
+    url2 = "https://gnews.io/api/v4/search"
     params2 = {
-        "q": "stock market OR finance OR economy OR wall street",
-        "sortBy": "popularity",
-        "language": "en",
-        "pageSize": 5,
-        "apiKey": api_key
+        "q": "finance OR stock market OR economy",
+        "lang": "es",
+        "max": 5,
+        "apikey": api_key
     }
 
     response2 = requests.get(url2, params=params2)
     data2 = response2.json()
     print(f"Response 2: {data2}")
 
-    if data2.get("status") == "ok":
-        return data2.get("articles", [])[:5]
+    if isinstance(data2, list):
+        return data2[:5]
 
     return []
 
