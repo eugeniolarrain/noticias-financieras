@@ -1,0 +1,32 @@
+name: Enviar Noticias Financieras
+
+on:
+  schedule:
+    # Todos los días a las 11:00 UTC (8:00 AM Chile, UTC-3 en verano / UTC-4 en invierno)
+    # Chile: UTC-3 (septiembre-marzo), UTC-4 (abril-agosto)
+    # Ajustado para 8:00 AM hora Chile
+    - cron: '0 11 * * *'
+  workflow_dispatch:  # Permite ejecutar manualmente para pruebas
+
+jobs:
+  enviar-noticias:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Enviar noticias
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
+        run: python main.py
