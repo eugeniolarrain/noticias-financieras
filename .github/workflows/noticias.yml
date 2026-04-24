@@ -2,9 +2,7 @@ name: Enviar Noticias Financieras
 
 on:
   schedule:
-    # Todos los días a las 11:00 UTC (8:00 AM Chile, UTC-3 en verano / UTC-4 en invierno)
-    # Chile: UTC-3 (septiembre-marzo), UTC-4 (abril-agosto)
-    # Ajustado para 8:00 AM hora Chile
+    # Todos los días a las 11:00 UTC (8:00 AM Chile)
     - cron: '0 11 * * *'
   workflow_dispatch:  # Permite ejecutar manualmente para pruebas
 
@@ -15,6 +13,16 @@ jobs:
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Verificar archivo main.py
+        run: |
+          echo "=== Contenido de main.py (primeras 25 lineas) ==="
+          head -25 main.py
+          echo "=== Buscando URL de API ==="
+          grep -n "gnews\|newsapi" main.py || echo "No se encontro URL de API"
 
       - name: Configurar Python
         uses: actions/setup-python@v5
