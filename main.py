@@ -3,7 +3,7 @@ import requests
 from datetime import datetime
 
 def obtener_noticias():
-    """Obtiene las 5 noticias más importantes de finanzas."""
+    """Obtiene las 5 noticias más importantes de finanzas usando GNews."""
 
     api_key = os.environ.get("NEWS_API_KEY")
     if not api_key:
