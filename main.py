@@ -9,7 +9,7 @@ def obtener_noticias():
     if not api_key:
         raise ValueError("NEWS_API_KEY no configurada")
 
-    # Buscamos noticias de negocios/finanzas (en inglés para más resultados)
+    # Intento 1: Top headlines business US
     url = "https://newsapi.org/v2/top-headlines"
     params = {
         "category": "business",
@@ -18,11 +18,36 @@ def obtener_noticias():
         "apiKey": api_key
     }
 
+    print(f"Llamando a NewsAPI: {url}")
     response = requests.get(url, params=params)
-    response.raise_for_status()
+    print(f"Status: {response.status_code}")
     data = response.json()
+    print(f"Response: {data}")
 
-    return data.get("articles", [])
+    if data.get("status") == "ok" and data.get("totalResults", 0) > 0:
+        articulos = data.get("articles", [])
+        print(f"Encontradas {len(articulos)} noticias")
+        return articulos[:5]
+
+    # Intento 2: Buscar por keywords de finanzas
+    print("Intentando búsqueda por keywords...")
+    url2 = "https://newsapi.org/v2/everything"
+    params2 = {
+        "q": "stock market OR finance OR economy OR wall street",
+        "sortBy": "popularity",
+        "language": "en",
+        "pageSize": 5,
+        "apiKey": api_key
+    }
+
+    response2 = requests.get(url2, params=params2)
+    data2 = response2.json()
+    print(f"Response 2: {data2}")
+
+    if data2.get("status") == "ok":
+        return data2.get("articles", [])[:5]
+
+    return []
 
 
 def enviar_telegram(mensaje):
@@ -53,7 +78,7 @@ def main():
         articulos = obtener_noticias()
 
         if not articulos:
-            enviar_telegram("📰 <b>Noticias Financieras</b>\n\nNo se encontraron noticias hoy.")
+            enviar_telegram("📰 <b>Noticias Financieras</b>\n\nNo se encontraron noticias hoy. Revisa los logs del workflow.")
             return
 
         # Construir el mensaje
@@ -63,12 +88,15 @@ def main():
         for i, articulo in enumerate(articulos, 1):
             titulo = articulo.get("title", "Sin título")
             url = articulo.get("url", "")
+            descripcion = articulo.get("description", "")
 
             # Limitar título a 100 caracteres
             if len(titulo) > 100:
                 titulo = titulo[:97] + "..."
 
             mensaje += f"{i}. <b>{titulo}</b>\n"
+            if descripcion:
+                mensaje += f"   _{descripcion[:150]}..._\n"
             mensaje += f"   🔗 <a href='{url}'>Leer más</a>\n\n"
 
         mensaje += "<i>Que tengas un gran día de inversiones! 📈</i>"
