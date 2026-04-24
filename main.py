@@ -9,12 +9,12 @@ def obtener_noticias():
     if not api_key:
         raise ValueError("NEWS_API_KEY no configurada")
 
-    # Buscamos noticias de negocios/finanzas
+    # Buscamos noticias de negocios/finanzas (en inglés para más resultados)
     url = "https://newsapi.org/v2/top-headlines"
     params = {
         "category": "business",
-        "language": "es",
-        "pageSize": 5,
+        "country": "us",
+        "pageSize": 10,
         "apiKey": api_key
     }
 
