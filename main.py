@@ -9,10 +9,10 @@ def obtener_noticias():
     if not api_key:
         raise ValueError("NEWS_API_KEY no configurada")
 
-    # Usamos GNews API enfocado en acciones e inversiones
-    url = "https://gnews.io/api/v4/search"
+    # Usamos GNews API (funciona desde servidores)
+    url = "https://gnews.io/api/v4/top-headlines"
     params = {
-        "q": "stock market acciones compra venta analyst",
+        "category": "business",
         "lang": "es",
         "max": 5,
         "apikey": api_key
@@ -30,11 +30,11 @@ def obtener_noticias():
             print(f"Encontradas {len(articulos)} noticias")
             return articulos
 
-    # Fallback: buscar por acciones populares
-    print("Intentando búsqueda por acciones populares...")
+    # Fallback: buscar por keywords
+    print("Intentando búsqueda por keywords...")
     url2 = "https://gnews.io/api/v4/search"
     params2 = {
-        "q": "Tesla Apple Amazon Microsoft accion bolsa",
+        "q": "finance OR stock market OR economy",
         "lang": "es",
         "max": 5,
         "apikey": api_key
@@ -90,24 +90,16 @@ def main():
             url = articulo.get("url", "")
             descripcion = articulo.get("description", "")
 
-            # Extraer recomendación básica del contenido
-            recomendacion = "📊"
-            texto_completo = (titulo + " " + descripcion).lower()
-            if any(p in texto_completo for p in ["compra", "buy", "alcista", "bullish", "oportunidad"]):
-                recomendacion = "✅ COMPRAR"
-            elif any(p in texto_completo for p in ["venta", "sell", "bajista", "bearish", "caida"]):
-                recomendacion = "❌ VENDER"
+            # Limitar título a 100 caracteres
+            if len(titulo) > 100:
+                titulo = titulo[:97] + "..."
 
-            # Limitar a 70 caracteres
-            if len(titulo) > 70:
-                titulo = titulo[:67] + "..."
-
-            mensaje += f"{i}. {recomendacion} <b>{titulo}</b>\n"
+            mensaje += f"{i}. <b>{titulo}</b>\n"
             if descripcion:
-                mensaje += f"    <i>{descripcion[:80]}...</i>\n"
-            mensaje += f"    🔗 <a href='{url}'>Link</a>\n\n"
+                mensaje += f"   _{descripcion[:150]}..._\n"
+            mensaje += f"   🔗 <a href='{url}'>Leer más</a>\n\n"
 
-        mensaje += "<b>📈 Resumen:</b> ✅COMPRAR | ❌VENDER | 📊ANALIZAR"
+        mensaje += "<i>Que tengas un gran día de inversiones! 📈</i>"
 
         enviar_telegram(mensaje)
         print(f"[{datetime.now()}] Noticias enviadas exitosamente!")
@@ -121,3 +113,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
