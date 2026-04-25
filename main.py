@@ -24,9 +24,11 @@ def obtener_noticias():
     data = response.json()
     print(f"Response: {data}")
 
-    if isinstance(data, list) and len(data) > 0:
-        print(f"Encontradas {len(data)} noticias")
-        return data
+    if isinstance(data, dict) and "articles" in data:
+        articulos = data["articles"]
+        if len(articulos) > 0:
+            print(f"Encontradas {len(articulos)} noticias")
+            return articulos
 
     # Fallback: buscar por keywords
     print("Intentando búsqueda por keywords...")
@@ -42,8 +44,8 @@ def obtener_noticias():
     data2 = response2.json()
     print(f"Response 2: {data2}")
 
-    if isinstance(data2, list):
-        return data2[:5]
+    if isinstance(data2, dict) and "articles" in data2:
+        return data2["articles"][:5]
 
     return []
 
